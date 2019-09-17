@@ -32,7 +32,11 @@ public class WordApp {
 
 	static WordPanel w;
 	
+	static JLabel caught;
+	static JLabel missed;
+	static JLabel scr;
 	
+	static String finishLine;
 	
 	public static void setupGUI(int frameX,int frameY,int yLimit) {
 		// Frame init and dimensions
@@ -52,9 +56,9 @@ public class WordApp {
 	    
 	    JPanel txt = new JPanel();
 	    txt.setLayout(new BoxLayout(txt, BoxLayout.LINE_AXIS)); 
-	    JLabel caught =new JLabel("Caught: " + score.getCaught() + "    ");
-	    JLabel missed =new JLabel("Missed:" + score.getMissed()+ "    ");
-	    JLabel scr =new JLabel("Score:" + score.getScore()+ "    ");    
+	    caught =new JLabel("Caught: " + score.getCaught() + "    ");
+	    missed =new JLabel("Missed:" + score.getMissed()+ "    ");
+	    scr =new JLabel("Score:" + score.getScore()+ "    ");    
 	    txt.add(caught);
 	    txt.add(missed);
 	    txt.add(scr);
@@ -66,7 +70,13 @@ public class WordApp {
 	    {
 	      public void actionPerformed(ActionEvent evt) {
 	          String text = textEntry.getText();
-	          //[snip]
+				for (int i = 0; i < noWords; i++) {
+					if (words[i].matchWord(text)) {
+						score.caughtWord(text.length());
+						caught.setText("Caught: " + score.getCaught() + "    ");
+						scr.setText("Score: " + score.getScore() + "    ");
+					}
+				}
 	          textEntry.setText("");
 	          textEntry.requestFocus();
 	      }
@@ -84,6 +94,25 @@ public class WordApp {
 		// add the listener to the jbutton to handle the "pressed" event
 		startB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				//if (WordPanel.done) {
+				startB.setText("Restart");
+				score.resetScore();
+				caught.setText("Caught: " + score.getCaught() + "    ");
+				missed.setText("Missed:" + score.getMissed() + "    ");
+				scr.setText("Score: " + score.getScore() + "    ");
+				finishLine = "You have won!!!";
+				for (int i = 0; i < noWords; i++) {
+					words[i].resetWord();
+				}
+				if (!WordPanel.done) {
+					WordPanel.done = true;
+					try {
+						Thread.sleep(30);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
 				WordPanel.done=false;
 				Thread t = new Thread(w);
 				t.start();
@@ -102,6 +131,7 @@ public class WordApp {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}*/
+				finishLine = "You have ended the game!";
 				WordPanel.done = true;
 			}
 		});
@@ -155,9 +185,10 @@ public static String[] getDictFromFile(String filename) {
 	public static void main(String[] args) {
     	
 		//deal with command line arguments
+		
 		//totalWords=Integer.parseInt(args[0]);  //total words to fall - takes in args[0]
 		//noWords=Integer.parseInt(args[1]); // total words falling at any point - takes in args[1]
-		totalWords=15;
+		totalWords=10;
 		noWords=6;
 		
 		
@@ -173,16 +204,15 @@ public static String[] getDictFromFile(String filename) {
 		words = new WordRecord[noWords];  //shared array of current words
 		
 		//[snip]
-		
 		setupGUI(frameX, frameY, yLimit);  
     	//Start WordPanel thread - for redrawing animation
-
 		int x_inc=(int)frameX/noWords;
 	  	//initialize shared array of current words
 
 		for (int i=0;i<noWords;i++) {
 			words[i]=new WordRecord(dict.getNewWord(),i*x_inc,yLimit);
 		}
+	
 		/*while (gameOn) {
 			//WordApp.w.run();
 			System.out.println("hej!!");
