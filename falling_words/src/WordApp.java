@@ -1,4 +1,4 @@
-package falling_words;
+
 
 
 import javax.swing.*;
@@ -193,15 +193,15 @@ public static String[] getDictFromFile(String filename) {
     	
 		//deal with command line arguments
 		
-		//totalWords=Integer.parseInt(args[0]);  //total words to fall - takes in args[0]
-		//noWords=Integer.parseInt(args[1]); // total words falling at any point - takes in args[1]
-		totalWords=10;
-		noWords=6;
+		totalWords=Integer.parseInt(args[0]);  //total words to fall - takes in args[0]
+		noWords=Integer.parseInt(args[1]); // total words falling at any point - takes in args[1]
+		//totalWords=10;
+		//noWords=6;
 		
 		
 		assert(totalWords>=noWords); // this could be done more neatly
 		
-		String[] tmpDict=getDictFromFile("own_gen_100.txt"); //file of words - takes in args[2]
+		String[] tmpDict=getDictFromFile(args[2]); //file of words - takes in args[2]
 		//String[] tmpDict = WordDictionary.theDict;
 		if (tmpDict!=null) {
 			dict= new WordDictionary(tmpDict);
@@ -221,17 +221,6 @@ public static String[] getDictFromFile(String filename) {
 		setupGUI(frameX, frameY, yLimit);  
     	//Start WordPanel thread - for redrawing animation
 	
-		/*while (gameOn) {
-			//WordApp.w.run();
-			System.out.println("hej!!");
-			try {
-				Thread.sleep(16);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}*/
-
 	}
 
 }
