@@ -1,6 +1,7 @@
 package falling_words;
 
-public class WordRecord {
+
+public class WordRecord implements Runnable  {
 	private String text;
 	private  int x;
 	private int y;
@@ -8,15 +9,23 @@ public class WordRecord {
 	private boolean dropped;
 	
 	private int fallingSpeed;
-	/*private static int maxWait=1500;
-	private static int minWait=100;*/
+	private static int maxWait=150;
+	private static int minWait=50;
 
-	private static int maxWait=4;
-	private static int minWait=1;
+	//private static int maxWait=4;
+	//private static int minWait=1;
 	
 	public static WordDictionary dict;
 	
-
+	private static double startTime;
+	
+	private static void tick(){
+		startTime = System.currentTimeMillis();
+	}
+	
+	private static double tock(){
+		return (System.currentTimeMillis() - startTime) / 1.0f; 
+	}
 	
 	WordRecord() {
 		text="";
@@ -25,6 +34,7 @@ public class WordRecord {
 		maxY=300;
 		dropped=false;
 		fallingSpeed=(int)(Math.random() * (maxWait-minWait)+minWait); 
+		fallingSpeed = 1000;
 	}
 	
 	WordRecord(String text) {
@@ -39,35 +49,37 @@ public class WordRecord {
 	}
 	
 // all getters and setters must be synchronized
-	public synchronized  void setY(int y) {
+	public synchronized void setY(int y) {
 		if (y>maxY) {
 			y=maxY;
 			dropped=true;
 		}
-		this.y=y;
+		synchronized (this) {
+			this.y=y;
+		}
 	}
 	
-	public synchronized  void setX(int x) {
+	public synchronized void setX(int x) {
 		this.x=x;
 	}
 	
-	public synchronized  void setWord(String text) {
+	public synchronized void setWord(String text) {
 		this.text=text;
 	}
 
-	public synchronized  String getWord() {
+	public synchronized String getWord() {
 		return text;
 	}
 	
-	public synchronized  int getX() {
+	public synchronized int getX() {
 		return x;
 	}	
 	
-	public synchronized  int getY() {
+	public synchronized int getY() {
 		return y;
 	}
 	
-	public synchronized  int getSpeed() {
+	public synchronized int getSpeed() {
 		return fallingSpeed;
 	}
 
@@ -83,7 +95,8 @@ public class WordRecord {
 		resetPos();
 		text=dict.getNewWord();
 		dropped=false;
-		fallingSpeed=(int)(Math.random() * (maxWait-minWait)+minWait); 
+		//fallingSpeed=(int)(Math.random() * (maxWait-minWait)+minWait); 
+		fallingSpeed = 1000;
 		//System.out.println(getWord() + " falling speed = " + getSpeed());
 
 	}
@@ -99,12 +112,32 @@ public class WordRecord {
 	}
 	
 
-	public synchronized  void drop(int inc) {
+	public synchronized void drop(int inc) {
 		setY(y+inc);
 	}
 	
-	public synchronized  boolean dropped() {
+	public synchronized boolean dropped() {
 		return dropped;
+	}
+
+	@Override
+	public void run() {
+		tick();
+		while (!WordPanel.done) {
+			if (tock() >= ((double) fallingSpeed)) {
+				//synchronized (this) {
+					System.out.println("hej=)=(=(=/()/=()/&)/(   " + fallingSpeed + "  " + tock());
+					drop(10);
+					tick();
+				//}
+				if (dropped()) {
+					WordApp.score.missedWord();
+					WordApp.missed.setText("Missed: " + WordApp.score.getMissed() + "    ");
+					resetWord();
+				}
+				//tick();
+			}
+		}
 	}
 
 }

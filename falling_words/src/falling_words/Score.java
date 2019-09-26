@@ -1,46 +1,48 @@
 package falling_words;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class Score {
-	private int missedWords;
-	private int caughtWords;
+	private AtomicInteger missedWords;
+	private AtomicInteger caughtWords;
 	private int gameScore;
 	
 	Score() {
-		missedWords=0;
-		caughtWords=0;
-		gameScore=0;
+		missedWords = new AtomicInteger(0);
+		caughtWords = new AtomicInteger(0);
+		gameScore = 0;
 	}
 		
 	// all getters and setters must be synchronized
 	
-	public int getMissed() {
+	public synchronized AtomicInteger getMissed() {
 		return missedWords;
 	}
 
-	public int getCaught() {
+	public synchronized AtomicInteger getCaught() {
 		return caughtWords;
 	}
 	
-	public int getTotal() {
-		return (missedWords+caughtWords);
+	public synchronized int getTotal() {
+		return (missedWords.get()+caughtWords.get());
 	}
 
-	public int getScore() {
+	public synchronized int getScore() {
 		return gameScore;
 	}
 	
 	public void missedWord() {
-		missedWords++;
+		missedWords.getAndIncrement();
 	}
 
 	public void caughtWord(int length) {
-		caughtWords++;
+		caughtWords.getAndIncrement();
 		gameScore+=length;
 	}
 
 	public void resetScore() {
-		caughtWords=0;
-		missedWords=0;
-		gameScore=0;
+		caughtWords.set(0);
+		missedWords.set(0);
+		gameScore = 0;
 	}
 }

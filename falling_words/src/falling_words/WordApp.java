@@ -1,5 +1,6 @@
 package falling_words;
 
+
 import javax.swing.*;
 
 import java.awt.*;
@@ -22,13 +23,13 @@ public class WordApp {
 	static int frameY=600;
 	static int yLimit=480;
 	
-	static boolean gameOn = false;
+	//static boolean gameOn = false;
 
 	static WordDictionary dict = new WordDictionary(); //use default dictionary, to read from file eventually
 
 	static WordRecord[] words;
-	static volatile boolean done;  //must be volatile
-	static 	Score score = new Score();
+	//static volatile boolean done;  //must be volatile
+	static	Score score = new Score();
 
 	static WordPanel w;
 	
@@ -101,6 +102,7 @@ public class WordApp {
 				missed.setText("Missed:" + score.getMissed() + "    ");
 				scr.setText("Score: " + score.getScore() + "    ");
 				finishLine = "You have won!!!";
+				Thread[] tArr = new Thread[noWords];
 				for (int i = 0; i < noWords; i++) {
 					words[i].resetWord();
 				}
@@ -116,6 +118,11 @@ public class WordApp {
 				WordPanel.done=false;
 				Thread t = new Thread(w);
 				t.start();
+				for (int i = 0; i < noWords; ++i) {
+					tArr[i] = new Thread(words[i]);
+					tArr[i].start();
+				}
+				textEntry.setText("");
 				textEntry.requestFocus(); // return focus to the text entry field
 			}
 		});
@@ -141,8 +148,8 @@ public class WordApp {
 		// add the listener to the jbutton to handle the "pressed" event
 		quitB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
 				WordPanel.done = true;
+				frame.dispose();
 			}
 		});
 		
@@ -194,7 +201,7 @@ public static String[] getDictFromFile(String filename) {
 		
 		assert(totalWords>=noWords); // this could be done more neatly
 		
-		String[] tmpDict=getDictFromFile("example_dict.txt"); //file of words - takes in args[2]
+		String[] tmpDict=getDictFromFile("own_gen_100.txt"); //file of words - takes in args[2]
 		//String[] tmpDict = WordDictionary.theDict;
 		if (tmpDict!=null) {
 			dict= new WordDictionary(tmpDict);
@@ -203,15 +210,16 @@ public static String[] getDictFromFile(String filename) {
 		
 		words = new WordRecord[noWords];  //shared array of current words
 		
-		//[snip]
-		setupGUI(frameX, frameY, yLimit);  
-    	//Start WordPanel thread - for redrawing animation
+		
 		int x_inc=(int)frameX/noWords;
 	  	//initialize shared array of current words
 
 		for (int i=0;i<noWords;i++) {
 			words[i]=new WordRecord(dict.getNewWord(),i*x_inc,yLimit);
 		}
+		//[snip]
+		setupGUI(frameX, frameY, yLimit);  
+    	//Start WordPanel thread - for redrawing animation
 	
 		/*while (gameOn) {
 			//WordApp.w.run();
