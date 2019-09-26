@@ -29,13 +29,10 @@ public class WordPanel extends JPanel implements Runnable {
 			g.drawString(WordApp.finishLine, width / 3, height / 2);
 		} else {
 		// draw the words
-		// animation must be added
 		for (int i = 0; i < noWords; i++) {
-			// g.drawString(words[i].getWord(),words[i].getX(),words[i].getY());
-			//synchronized(WordApp.words[i]) {
-			//System.out.println("hola");
+			synchronized(WordApp.words[i]) {
 			g.drawString(WordApp.words[i].getWord(), WordApp.words[i].getX(), WordApp.words[i].getY());
-			//}
+			}
 		}
 	}
 

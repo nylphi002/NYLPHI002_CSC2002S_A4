@@ -9,22 +9,22 @@ public class WordRecord implements Runnable  {
 	private boolean dropped;
 	
 	private int fallingSpeed;
-	private static int maxWait=150;
-	private static int minWait=50;
+	private static int maxWait=350;
+	private static int minWait=100;
 
 	//private static int maxWait=4;
 	//private static int minWait=1;
 	
 	public static WordDictionary dict;
 	
-	private static double startTime;
+	private double startTime;
 	
-	private static void tick(){
-		startTime = System.currentTimeMillis();
+	private void tick(){
+		this.startTime = System.currentTimeMillis();
 	}
 	
-	private static double tock(){
-		return (System.currentTimeMillis() - startTime) / 1.0f; 
+	private double tock(){
+		return (System.currentTimeMillis() - this.startTime) / 1.0f; 
 	}
 	
 	WordRecord() {
@@ -34,7 +34,6 @@ public class WordRecord implements Runnable  {
 		maxY=300;
 		dropped=false;
 		fallingSpeed=(int)(Math.random() * (maxWait-minWait)+minWait); 
-		fallingSpeed = 1000;
 	}
 	
 	WordRecord(String text) {
@@ -54,9 +53,7 @@ public class WordRecord implements Runnable  {
 			y=maxY;
 			dropped=true;
 		}
-		synchronized (this) {
 			this.y=y;
-		}
 	}
 	
 	public synchronized void setX(int x) {
@@ -95,8 +92,7 @@ public class WordRecord implements Runnable  {
 		resetPos();
 		text=dict.getNewWord();
 		dropped=false;
-		//fallingSpeed=(int)(Math.random() * (maxWait-minWait)+minWait); 
-		fallingSpeed = 1000;
+		fallingSpeed=(int)(Math.random() * (maxWait-minWait)+minWait); 
 		//System.out.println(getWord() + " falling speed = " + getSpeed());
 
 	}
@@ -125,15 +121,18 @@ public class WordRecord implements Runnable  {
 		tick();
 		while (!WordPanel.done) {
 			if (tock() >= ((double) fallingSpeed)) {
-				//synchronized (this) {
-					System.out.println("hej=)=(=(=/()/=()/&)/(   " + fallingSpeed + "  " + tock());
+				tick();
+				synchronized(this) {
 					drop(10);
-					tick();
-				//}
+				}
 				if (dropped()) {
 					WordApp.score.missedWord();
-					WordApp.missed.setText("Missed: " + WordApp.score.getMissed() + "    ");
-					resetWord();
+					synchronized(WordApp.dict) {
+						WordApp.missed.setText("Missed: " + WordApp.score.getMissed() + "    ");
+					}
+					synchronized(this) {
+						resetWord();
+					}
 				}
 				//tick();
 			}
