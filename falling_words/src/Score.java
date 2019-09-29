@@ -1,48 +1,64 @@
 
-
-import java.util.concurrent.atomic.AtomicInteger;
+/**
+ * The class Score is a part of the model, storing all running totals and methods to modify/access these values. The totals are:
+ * <p>
+ * <ul>
+ * <li> Number of missed words
+ * <li> Number of caught words
+ * <li> Number of points
+ * </ul>
+ * <p>
+ * @author      Philip Nylén
+ * @version     1.8
+ * @since       1.0
+ */
 
 public class Score {
-	private AtomicInteger missedWords;
-	private AtomicInteger caughtWords;
-	private AtomicInteger gameScore;
-	
+	private int missedWords;
+	private int caughtWords;
+	private int gameScore;
+
 	Score() {
-		missedWords = new AtomicInteger(0);
-		caughtWords = new AtomicInteger(0);
-		gameScore = new AtomicInteger(0);
-	}
-		
-	// all getters and setters must be synchronized
-	
-	public synchronized int getMissed() {
-		return missedWords.get();
+		missedWords = 0;
+		caughtWords = 0;
+		gameScore = 0;
 	}
 
-	public synchronized AtomicInteger getCaught() {
+	public synchronized int getMissed() {
+		return missedWords;
+	}
+
+	public synchronized int getCaught() {
 		return caughtWords;
 	}
-	
+
 	public synchronized int getTotal() {
-		return (missedWords.get()+caughtWords.get());
+		return (missedWords + caughtWords);
 	}
 
-	public synchronized AtomicInteger getScore() {
+	public synchronized int getScore() {
 		return gameScore;
 	}
-	
-	public void missedWord() {
-		missedWords.getAndIncrement();
+
+	public synchronized void missedWord() {
+		missedWords++;
 	}
 
-	public void caughtWord(int length) {
-		caughtWords.getAndIncrement();
-		gameScore.getAndAdd(length);
+	public synchronized void caughtWord(int length) {
+		if (WordApp.score.getCaught() < WordApp.totalWords) {
+			caughtWords++;
+			gameScore += length;
+			WordRecord.speedUpWords();
+		}
+		// checks if the word limit is reached
+		if (WordApp.score.getCaught() == WordApp.totalWords) {
+			WordApp.done = true;
+		}
 	}
 
-	public void resetScore() {
-		caughtWords.set(0);
-		missedWords.set(0);
-		gameScore.set(0);
+	public synchronized void resetScore() {
+		caughtWords = 0;
+		missedWords = 0;
+		gameScore = 0;
 	}
 }
