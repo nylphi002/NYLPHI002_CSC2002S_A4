@@ -22,7 +22,7 @@ default: classes
 classes: $(CLASSES:.java=.class)
 
 run: 
-	java -cp bin WordApp 15 7 7
+	java -cp bin WordApp 15 6 example.txt
 
 docs: $(JAVADOC) -d $(DOC) $(SRC)*.java
 
