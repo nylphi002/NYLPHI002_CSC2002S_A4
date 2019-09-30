@@ -15,8 +15,8 @@ public class WordRecord implements Runnable {
 	private boolean dropped;
 
 	private int fallingSpeed;
-	private static int maxWait;
-	private static int minWait;
+	private static int maxWait = 350;
+	private static int minWait = 100;
 
 	public static WordDictionary dict;
 
@@ -36,8 +36,6 @@ public class WordRecord implements Runnable {
 		y = 0;
 		maxY = 300;
 		dropped = false;
-		maxWait = 350;
-		minWait = 100;
 		fallingSpeed = (int) (Math.random() * (maxWait - minWait) + minWait);
 	}
 
@@ -123,6 +121,8 @@ public class WordRecord implements Runnable {
 
 	@Override
 	public void run() {
+		maxWait = 350;
+		minWait = 100;
 		startTimer();
 		while (!WordApp.done) {
 			if (timer() >= ((double) fallingSpeed)) {
